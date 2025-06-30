@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ODI World Cup Winners - Vega-Lite</title>
+
+  <!-- Step 1: Load Vega, Vega-Lite, and Vega-Embed from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+  <style>
+    /* Step 2: Optional styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    #yearsDisplay {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>🏏 ODI Cricket World Cup Winners</h2>
+
+  <!-- Step 3: Container where the Vega-Lite chart will be embedded -->
+  <div id="vis"></div>
+
+  <!-- Step 4: Display area for showing years when a bar is clicked -->
+  <div id="yearsDisplay">Click on a bar to see the years won.</div>
+
+  <script>
+    // Step 5: Define the data inline
+    const data = [
+      { team: "Australia", wins: 6, years: "1987, 1999, 2003, 2007, 2015, 2023" },
+      { team: "India", wins: 2, years: "1983, 2011" },
+      { team: "West Indies", wins: 2, years: "1975, 1979" },
+      { team: "Pakistan", wins: 1, years: "1992" },
+      { team: "Sri Lanka", wins: 1, years: "1996" },
+      { team: "England", wins: 1, years: "2019" }
+    ];
+
+    // Step 6: Define the Vega-Lite specification
+    const spec = {
+      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      description: "ODI Cricket World Cup Winners",
+      data: { values: data },
+      width: 500,
+      height: 300,
+      mark: "bar",
+      selection: {
+        selectTeam: {
+          type: "single",
+          fields: ["team"],
+          on: "click"
+        }
+      },
+      encoding: {
+        x: {
+          field: "team",
+          type: "nominal",
+          sort: "-y",
+          axis: { title: "Team" }
+        },
+        y: {
+          field: "wins",
+          type: "quantitative",
+          axis: { title: "Number of Wins" }
+        },
+        color: {
+          field: "team",
+          type: "nominal",
+          legend: null
+        },
+        tooltip: [
+          { field: "team", title: "Team" },
+          { field: "wins", title: "Wins" },
+          { field: "years", title: "Years Won" }
+        ]
+      }
+    };
+
+    // Step 7: Embed the Vega-Lite visualization
+    vegaEmbed("#vis", spec).then(result => {
+      // Step 8: Add interactivity: show years on click
+      result.view.addSignalListener("selectTeam_team", (name, value) => {
+        const selected = data.find(d => d.team === value);
+        if (selected) {
+          document.getElementById("yearsDisplay").textContent =
+            `${selected.team} won in: ${selected.years}`;
+        } else {
+          document.getElementById("yearsDisplay").textContent =
+            "Click on a bar to see the years won.";
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

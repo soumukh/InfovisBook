@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ODI World Cup Winners from CSV</title>
+  <!-- Step 1: Load Plotly.js and PapaParse (for CSV parsing) -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #info {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Step 2: Title and chart container -->
+  <h2>ODI Cricket World Cup Winners</h2>
+  <div id="barChart" style="width:100%; max-width:800px; height:500px;"></div>
+  <div id="info">Click a bar to see the years the team won.</div>
+
+  <script>
+    // Step 3: Load CSV using PapaParse
+    Papa.parse('odi_wc_winners.csv', {
+      download: true,
+      header: true,
+      complete: function(results) {
+        // Step 4: Extract data
+        const data = results.data;
+        const teams = data.map(row => row.Team);
+        const champions = data.map(row => +row.Champions);
+        const yearsMap = {};
+        data.forEach(row => {
+          yearsMap[row.Team] = row.Years;
+        });
+
+        // Step 5: Create the bar chart
+        const trace = {
+          x: teams,
+          y: champions,
+          type: 'bar',
+          marker: { color: 'teal' }
+        };
+
+        const layout = {
+          title: 'Number of ODI World Cup Wins by Country',
+          xaxis: { title: 'Team' },
+          yaxis: { title: 'Wins' }
+        };
+
+        Plotly.newPlot('barChart', [trace], layout);
+
+        // Step 6: Add click event to show win years
+        document.getElementById('barChart').on('plotly_click', function(data) {
+          const team = data.points[0].x;
+          const years = yearsMap[team];
+          document.getElementById('info').innerText = `${team} won in: ${years}`;
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
+

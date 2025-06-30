@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ODI World Cup Winners - Chart.js</title>
+  <!-- Step 1: Load Chart.js from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Step 2: Basic styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      padding: 40px;
+      text-align: center;
+    }
+    canvas {
+      max-width: 800px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>ODI Cricket World Cup Winners</h2>
+
+  <!-- Step 3: Chart canvas -->
+  <canvas id="worldCupChart"></canvas>
+
+  <!-- Step 4: JavaScript for Chart.js -->
+  <script>
+    // Step 5: Prepare the data
+    const teams = ["West Indies", "India", "Australia", "Pakistan", "Sri Lanka", "England"];
+    const wins = [2, 2, 6, 1, 1, 1];
+    const winYears = {
+      "West Indies": "1975, 1979",
+      "India": "1983, 2011",
+      "Australia": "1987, 1999, 2003, 2007, 2015, 2023",
+      "Pakistan": "1992",
+      "Sri Lanka": "1996",
+      "England": "2019"
+    };
+
+    // Step 6: Create Chart.js chart
+    const ctx = document.getElementById('worldCupChart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',  // 👈 This makes it a bar chart
+      data: {
+        labels: teams,
+        datasets: [{
+          label: 'World Cups Won',
+          data: wins,
+          backgroundColor: 'steelblue'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              // Step 7: Custom tooltip to show winning years
+              afterLabel: function(context) {
+                const team = context.label;
+                return "Years: " + winYears[team];
+              }
+            }
+          },
+          title: {
+            display: true,
+            text: 'ODI Cricket World Cup Winners'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Championships'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Teams'
+            }
+          }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>

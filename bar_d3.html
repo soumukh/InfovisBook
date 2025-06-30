@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ODI World Cup Winners - D3 Bar Chart</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    /* Style the SVG container */
+    svg {
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    /* Style for the tooltip box */
+    .tooltip {
+      position: absolute;
+      background: white;
+      border: 1px solid #ccc;
+      padding: 8px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px #aaa;
+      pointer-events: none;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>ODI Cricket World Cup Titles by Country</h2>
+
+<!-- Chart container -->
+<div id="chart"></div>
+
+<!-- Tooltip container -->
+<div class="tooltip" style="opacity: 0;"></div>
+
+<script>
+  // Step 1: Data
+  const data = [
+    { team: "West Indies", wins: 2, years: ["1975", "1979"] },
+    { team: "India", wins: 2, years: ["1983", "2011"] },
+    { team: "Australia", wins: 6, years: ["1987", "1999", "2003", "2007", "2015", "2023"] },
+    { team: "Pakistan", wins: 1, years: ["1992"] },
+    { team: "Sri Lanka", wins: 1, years: ["1996"] },
+    { team: "England", wins: 1, years: ["2019"] }
+  ];
+
+  // Step 2: Dimensions
+  const margin = { top: 40, right: 20, bottom: 60, left: 60 };
+  const width = 800 - margin.left - margin.right;
+  const height = 400 - margin.top - margin.bottom;
+
+  // Step 3: Create SVG
+  const svg = d3.select("#chart")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")  // Group to apply margins
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // Step 4: X and Y scales
+  const x = d3.scaleBand()
+    .domain(data.map(d => d.team))
+    .range([0, width])
+    .padding(0.2);
+
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.wins) + 1])
+    .nice()
+    .range([height, 0]);
+
+  // Step 5: Axes
+  svg.append("g")
+    .attr("transform", `translate(0,${height})`)
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+    .attr("transform", "rotate(-30)")
+    .style("text-anchor", "end");
+
+  svg.append("g")
+    .call(d3.axisLeft(y));
+
+  // Step 6: Tooltip reference
+  const tooltip = d3.select(".tooltip");
+
+  // Step 7: Draw bars
+  svg.selectAll(".bar")
+    .data(data)
+    .enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("x", d => x(d.team))
+    .attr("y", d => y(d.wins))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d.wins))
+    .attr("fill", "steelblue")
+    .on("click", (event, d) => {
+      // On click, show tooltip with years
+      tooltip
+        .html(`<strong>${d.team}</strong><br>Years: ${d.years.join(", ")}`)
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 40) + "px")
+        .transition()
+        .duration(200)
+        .style("opacity", 1);
+    });
+
+  // Optional: Hide tooltip on clicking anywhere else
+  d3.select("body").on("click", function (event) {
+    const target = event.target;
+    if (!target.closest(".bar")) {
+      tooltip.transition().duration(200).style("opacity", 0);
+    }
+  });
+
+  // Step 8: Add Y-axis label
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", -40)
+    .attr("x", -height / 2)
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Number of World Cup Wins");
+
+</script>
+
+</body>
+</html>
